@@ -1,0 +1,23 @@
+server:
+  port: 8082
+  tomcat:
+    accesslog:
+      enabled: true
+      pattern: "%h %l %u %t \"%r\" %s %b"
+      directory: "logs"
+      prefix: "access_log"
+      suffix: ".log"
+spring:
+  datasource:
+    url: jdbc:postgresql://database-1.cvmc20q8k81x.sa-east-1.rds.amazonaws.com:5432/postgres
+    username: postgres
+    password: superadmin
+  jpa:
+    hibernate:
+      ddl-auto: update
+      dialect: org.hibernate.dialect.PostgresSQLDialect
+      jdbc:
+        lob.non-contextual-creation: true
+    properties:
+      hibernate: 
+        show_sql: true
