@@ -1,6 +1,5 @@
 package com.ead.course.services.impl;
 
-import com.ead.course.repository.ModuleRepository;
 import com.ead.course.services.CourseService;
 
 import java.util.List;
@@ -13,10 +12,10 @@ import com.ead.course.models.CourseModel;
 public class CourseServiceImpl implements CourseService {
 
   @Autowired
-  ModuleRepository moduleRepository;
+  CourseService courseService;
 
   public List<CourseModel> findAll() {
-    return moduleRepository.findAll();
+    return courseService.findAll();
   }
 
 }

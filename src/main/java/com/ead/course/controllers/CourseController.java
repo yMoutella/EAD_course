@@ -1,5 +1,7 @@
 package com.ead.course.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,9 +22,9 @@ public class CourseController {
   @GetMapping(path = "/list")
   public ResponseEntity<?> getCourses() {
 
-    CourseModel courseModel = courseService.
+    List<CourseModel> courseModel = courseService.findAll();
 
-    return ResponseEntity.status(HttpStatus.OK).body("success!");
+    return ResponseEntity.status(HttpStatus.OK).body(courseModel);
   }
 
 }
