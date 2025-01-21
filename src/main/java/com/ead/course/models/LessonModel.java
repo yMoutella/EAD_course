@@ -28,9 +28,6 @@ public class LessonModel implements Serializable {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private UUID lessonId;
 
-  @Id
-  private UUID moduleId;
-
   @Column(nullable = false, length = 150)
   private String title;
 

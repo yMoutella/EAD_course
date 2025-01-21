@@ -30,6 +30,6 @@ public class CourseController {
 
   @PutMapping(path = "/register")
   public ResponseEntity<?> registerCourse() {
-    return new ResponseEntity.status(HttpStatus.OK).body("Deu bom");
+    return ResponseEntity.status(HttpStatus.OK).body("Deu bom");
   }
 }

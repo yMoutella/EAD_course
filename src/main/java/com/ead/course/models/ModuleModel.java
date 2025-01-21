@@ -29,8 +29,6 @@ public class ModuleModel implements Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private UUID moduleId;
-  @Id
-  private UUID courseId;
 
   @Column(nullable = false, length = 150)
   private String title;
