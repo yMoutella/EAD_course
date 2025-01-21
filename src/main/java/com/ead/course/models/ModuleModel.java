@@ -2,6 +2,7 @@ package com.ead.course.models;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -13,6 +14,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -42,5 +44,8 @@ public class ModuleModel implements Serializable {
 
   @ManyToOne(optional = false)
   private CourseModel course;
+
+  @OneToMany(mappedBy = "module")
+  private Set<LessonModel> lesson;
 
 }
