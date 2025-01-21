@@ -37,9 +37,6 @@ public class CourseModel implements Serializable {
   @Column(nullable = false, length = 250)
   private String description;
 
-  @Column
-  private String imageUrl;
-
   @Column(nullable = false)
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
   private LocalDateTime creationDate;
@@ -58,5 +55,8 @@ public class CourseModel implements Serializable {
 
   @Column(nullable = false)
   private UUID userInsctructor;
+
+  @Column
+  private String imageUrl;
 
 }
