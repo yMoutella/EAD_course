@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,6 +50,15 @@ public class CourseController {
   public ResponseEntity<String> registerCourse(
       @RequestBody @JsonView(CourseDto.CourseView.CourseRegistration.class) CourseDto dto) {
 
-    return ResponseEntity.status(HttpStatus.OK).body("Deu bom");
+    Optional<CourseModel> course = courseService.findByCourseId(dto.getCourseId());
+    if (!course.isEmpty()) {
+      BeanUtils.copyProperties(dto, course);
+
+      course.setCreationDate(dto.getCreationDate());
+      course.setUpdateDate(dto.getLastUpdateDate());
+
+      return ResponseEntity.status(HttpStatus.OK).body("Course created with successfuly!");
+    }
+    return ResponseEntity.status(HttpStatus.OK).body("Course already existed!");
   }
 }

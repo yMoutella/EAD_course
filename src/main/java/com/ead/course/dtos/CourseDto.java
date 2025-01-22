@@ -19,7 +19,6 @@ public class CourseDto {
 		}
 	}
 
-	@JsonView(CourseView.CourseRegistration.class)
 	private UUID courseId;
 
 	@JsonView(CourseView.CourseRegistration.class)
@@ -29,10 +28,8 @@ public class CourseDto {
 	private String description;
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
-	@JsonView(CourseView.CourseRegistration.class)
 	private LocalDateTime creationDate;
 
-	@JsonView(CourseView.CourseRegistration.class)
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
 	private LocalDateTime lastUpdateDate;
 
