@@ -1,11 +1,14 @@
 package com.ead.course.controllers;
 
+import java.sql.Time;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,16 +53,14 @@ public class CourseController {
   public ResponseEntity<String> registerCourse(
       @RequestBody @JsonView(CourseDto.CourseView.CourseRegistration.class) CourseDto dto) {
 
-    Optional<CourseModel> course = courseService.findByCourseId(dto.getCourseId());
+      var courseModel = new CourseModel();
+      BeanUtils.copyProperties(dto, courseModel);
 
-    if (!course.isEmpty()) {
+      courseModel.setCreationDate(LocalDateTime.now(ZoneId.of("UTC")));
+      courseModel.setLastUpdateDate(LocalDateTime.now(ZoneId.of("UTC")));
 
-      var courseModel = course.get();
-      courseModel.setCreationDate(dto.getCreationDate());
-      courseModel.setLastUpdateDate(dto.getLastUpdateDate());
+      courseService.save(courseModel);
 
-      return ResponseEntity.status(HttpStatus.OK).body("Course created with successfuly!");
-    }
-    return ResponseEntity.status(HttpStatus.OK).body("Course already existed!");
+      return ResponseEntity.status(HttpStatus.CREATED).body("Course created with successfuly!");
   }
 }

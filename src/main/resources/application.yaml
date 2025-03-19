@@ -9,9 +9,9 @@ server:
       suffix: ".log"
 spring:
   datasource:
-    url: jdbc:postgresql://database-1.cvmc20q8k81x.sa-east-1.rds.amazonaws.com:5432/postgres
+    url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
-    password: superadmin
+    password: admin
   jpa:
     hibernate:
       ddl-auto: update

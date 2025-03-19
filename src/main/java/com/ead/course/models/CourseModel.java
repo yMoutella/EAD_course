@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import org.springframework.hateoas.RepresentationModel;
+
 import java.util.Set;
 
 import com.ead.course.enums.CourseLevel;
@@ -26,7 +28,7 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
 @Table(name = "TB_COURSES")
-public class CourseModel implements Serializable {
+public class CourseModel extends RepresentationModel<CourseModel> implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -56,7 +58,7 @@ public class CourseModel implements Serializable {
   @Enumerated(EnumType.STRING)
   private CourseLevel courseLevel;
 
-  @Column(nullable = false)
+  @Column(nullable = true)
   private UUID userInsctructor;
 
   @Column
