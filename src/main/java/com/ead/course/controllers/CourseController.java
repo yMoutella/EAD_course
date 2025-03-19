@@ -51,11 +51,12 @@ public class CourseController {
       @RequestBody @JsonView(CourseDto.CourseView.CourseRegistration.class) CourseDto dto) {
 
     Optional<CourseModel> course = courseService.findByCourseId(dto.getCourseId());
-    if (!course.isEmpty()) {
-      BeanUtils.copyProperties(dto, course);
 
-      course.setCreationDate(dto.getCreationDate());
-      course.setUpdateDate(dto.getLastUpdateDate());
+    if (!course.isEmpty()) {
+
+      var courseModel = course.get();
+      courseModel.setCreationDate(dto.getCreationDate());
+      courseModel.setLastUpdateDate(dto.getLastUpdateDate());
 
       return ResponseEntity.status(HttpStatus.OK).body("Course created with successfuly!");
     }
