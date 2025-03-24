@@ -27,40 +27,40 @@ import com.fasterxml.jackson.annotation.JsonView;
 @RequestMapping(path = "/courses")
 public class CourseController {
 
-  @Autowired
-  CourseService courseService;
+    @Autowired
+    CourseService courseService;
 
-  @GetMapping(path = "/list")
-  public ResponseEntity<List<CourseModel>> getCourses() {
+    @GetMapping(path = "/list")
+    public ResponseEntity<List<CourseModel>> getCourses() {
 
-    List<CourseModel> courseModel = courseService.findAll();
-    return ResponseEntity.status(HttpStatus.OK).body(courseModel);
+        List<CourseModel> courseModel = courseService.findAll();
+        return ResponseEntity.status(HttpStatus.OK).body(courseModel);
 
-  }
-
-  @GetMapping(path = "/{courseId}")
-  public ResponseEntity<Object> getCourses(@PathVariable UUID courseId) {
-
-    Optional<CourseModel> courseModel = courseService.findByCourseId(courseId);
-    if (!courseModel.isEmpty()) {
-      return ResponseEntity.status(HttpStatus.OK).body(courseModel);
     }
 
-    return ResponseEntity.status(HttpStatus.OK).body("Course not found!");
-  }
+    @GetMapping(path = "/{courseId}")
+    public ResponseEntity<Object> getCourses(@PathVariable UUID courseId) {
 
-  @PostMapping(path = "/register")
-  public ResponseEntity<String> registerCourse(
-      @RequestBody @JsonView(CourseDto.CourseView.CourseRegistration.class) CourseDto dto) {
+        Optional<CourseModel> courseModel = courseService.findByCourseId(courseId);
+        if (!courseModel.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.OK).body(courseModel);
+        }
 
-      var courseModel = new CourseModel();
-      BeanUtils.copyProperties(dto, courseModel);
+        return ResponseEntity.status(HttpStatus.OK).body("Course not found!");
+    }
 
-      courseModel.setCreationDate(LocalDateTime.now(ZoneId.of("UTC")));
-      courseModel.setLastUpdateDate(LocalDateTime.now(ZoneId.of("UTC")));
+    @PostMapping(path = "/register")
+    public ResponseEntity<String> registerCourse(
+            @RequestBody @JsonView(CourseDto.CourseView.CourseRegistration.class) CourseDto dto) {
 
-      courseService.save(courseModel);
+        var courseModel = new CourseModel();
+        BeanUtils.copyProperties(dto, courseModel);
 
-      return ResponseEntity.status(HttpStatus.CREATED).body("Course created with successfuly!");
-  }
+        courseModel.setCreationDate(LocalDateTime.now(ZoneId.of("UTC")));
+        courseModel.setLastUpdateDate(LocalDateTime.now(ZoneId.of("UTC")));
+
+        courseService.save(courseModel);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body("Course created with successfuly!");
+    }
 }

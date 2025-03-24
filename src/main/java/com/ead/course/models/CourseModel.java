@@ -12,6 +12,7 @@ import com.ead.course.enums.CourseLevel;
 import com.ead.course.enums.CourseStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,41 +31,42 @@ import lombok.Data;
 @Table(name = "TB_COURSES")
 public class CourseModel extends RepresentationModel<CourseModel> implements Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private UUID courseId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID courseId;
 
-  @Column(nullable = false, length = 150)
-  private String name;
+    @Column(nullable = false, length = 150)
+    private String name;
 
-  @Column(nullable = false, length = 250)
-  private String description;
+    @Column(nullable = false, length = 250)
+    private String description;
 
-  @Column(nullable = false)
-  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
-  private LocalDateTime creationDate;
+    @Column(nullable = false)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
+    private LocalDateTime creationDate;
 
-  @Column(nullable = false)
-  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
-  private LocalDateTime lastUpdateDate;
+    @Column(nullable = false)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
+    private LocalDateTime lastUpdateDate;
 
-  @Column(nullable = false)
-  @Enumerated(EnumType.STRING)
-  private CourseStatus courseStatus;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private CourseStatus courseStatus;
 
-  @Column(nullable = false)
-  @Enumerated(EnumType.STRING)
-  private CourseLevel courseLevel;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private CourseLevel courseLevel;
 
-  @Column(nullable = true)
-  private UUID userInsctructor;
+    @Column(nullable = true)
+    private UUID userInsctructor;
 
-  @Column
-  private String imageUrl;
+    @Column
+    private String imageUrl;
 
-  @OneToMany(mappedBy = "course")
-  private Set<ModuleModel> modules;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @OneToMany(mappedBy = "course")
+    private Set<ModuleModel> modules;
 
 }
