@@ -6,6 +6,8 @@ import com.ead.course.repository.LessonRepository;
 import com.ead.course.repository.ModuleRepository;
 import com.ead.course.services.ModuleService;
 
+import jakarta.transaction.Transactional;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ public class ModuleServiceImpl implements ModuleService {
   @Autowired
   LessonRepository lessonRepository;
 
+  @Transactional
   @Override
   public void delete(ModuleModel module) {
 
