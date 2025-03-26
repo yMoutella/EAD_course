@@ -5,6 +5,10 @@ import com.ead.course.enums.CourseStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.Data;
@@ -14,14 +18,17 @@ import lombok.Data;
 public class CourseDto {
 
   public interface CourseView {
-    public static interface CourseRegistration {}
+    public static interface CourseRegistration {
+    }
   }
 
   private UUID courseId;
 
+  @NotBlank
   @JsonView(CourseView.CourseRegistration.class)
   private String name;
 
+  @NotBlank
   @JsonView(CourseView.CourseRegistration.class)
   private String description;
 
@@ -31,12 +38,15 @@ public class CourseDto {
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
   private LocalDateTime lastUpdateDate;
 
+  @NotNull
   @JsonView(CourseView.CourseRegistration.class)
   private CourseStatus courseStatus;
 
+  @NotNull
   @JsonView(CourseView.CourseRegistration.class)
   private CourseLevel courseLevel;
 
-  //@JsonView(CourseView.CourseRegistration.class)
-  //private UUID userInstructor;
+  @NotNull
+  @JsonView(CourseView.CourseRegistration.class)
+  private UUID userInstructor;
 }

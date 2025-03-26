@@ -40,8 +40,8 @@ public class CourseServiceImpl implements CourseService {
   }
 
   @Override
-  public void save(CourseModel course) {
-    courseRepository.save(course);
+  public CourseModel save(CourseModel course) {
+    return courseRepository.save(course);
   }
 
   @Transactional
@@ -62,6 +62,7 @@ public class CourseServiceImpl implements CourseService {
         moduleRepository.deleteAll(moduleList);
 
       }
+      courseRepository.deleteById(course.getCourseId());
     } catch (Exception e) {
       System.out.printf("Error in course deletion %s", e);
     }

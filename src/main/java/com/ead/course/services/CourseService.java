@@ -11,7 +11,7 @@ public interface CourseService {
 
 	Optional<CourseModel> findByCourseId(UUID courseId);
 
-	void save(CourseModel course);
+	CourseModel save(CourseModel course);
 
 	void delete(CourseModel course);
 }
