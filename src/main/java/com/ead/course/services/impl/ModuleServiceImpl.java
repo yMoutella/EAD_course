@@ -9,6 +9,7 @@ import com.ead.course.services.ModuleService;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,5 +36,33 @@ public class ModuleServiceImpl implements ModuleService {
     moduleRepository.delete(module);
 
     throw new UnsupportedOperationException("Unimplemented method 'delete'");
+  }
+
+  @Override
+  public Boolean existsById(UUID moduleId) {
+    return moduleRepository.existsById(moduleId);
+  }
+
+  @Override
+  public Boolean existsModuleGivenCourseId(UUID courseId, String title) {
+
+    List<ModuleModel> modules = moduleRepository.findAllModulesIntoCourse(courseId);
+
+    for (ModuleModel model : modules) {
+      if (model.getTitle().equals(title)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
+  public ModuleModel save(ModuleModel module) {
+    try {
+      return moduleRepository.save(module);
+    } catch (Exception e) {
+      System.out.printf("Error trying to save module %s ----> %s", module.getModuleId(), e);
+      return null;
+    }
   }
 }

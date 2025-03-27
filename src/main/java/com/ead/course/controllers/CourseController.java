@@ -10,6 +10,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,7 +36,7 @@ public class CourseController {
 
     @PostMapping
     public ResponseEntity<CourseModel> registerCourse(
-            @RequestBody @JsonView(CourseDto.CourseView.CourseRegistration.class) CourseDto dto) {
+            @Validated(CourseDto.CourseView.CourseRegistration.class) @RequestBody @JsonView(CourseDto.CourseView.CourseRegistration.class) CourseDto dto) {
 
         var courseModel = new CourseModel();
         BeanUtils.copyProperties(dto, courseModel);
@@ -62,22 +63,6 @@ public class CourseController {
 
     }
 
-    @PutMapping(path = "/{courseId}")
-    public ResponseEntity<String> updateCourse(@PathVariable UUID courseId) {
-
-        Optional<CourseModel> course = courseService.findByCourseId(courseId);
-
-        if (course.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("This course doesn't exist");
-        }
-
-        var courseModel = course.get();
-
-        courseService.delete(courseModel);
-        return ResponseEntity.status(HttpStatus.OK).body("Course: " + courseId + " deleted successfully!");
-
-    }
-
     @GetMapping(path = "/list")
     public ResponseEntity<List<CourseModel>> getCourses() {
 
@@ -87,7 +72,7 @@ public class CourseController {
     }
 
     @GetMapping(path = "/{courseId}")
-    public ResponseEntity<Object> getCourses(@PathVariable UUID courseId) {
+    public ResponseEntity<Object> getCourse(@PathVariable UUID courseId) {
 
         Optional<CourseModel> courseModel = courseService.findByCourseId(courseId);
         if (!courseModel.isEmpty()) {
@@ -95,6 +80,25 @@ public class CourseController {
         }
 
         return ResponseEntity.status(HttpStatus.OK).body("Course not found!");
+    }
+
+    @PutMapping
+    public ResponseEntity<CourseModel> updateCourse(
+            @RequestBody CourseDto courseDto) {
+
+        Optional<CourseModel> course = courseService.findByCourseId(courseDto.getCourseId());
+
+        if (course.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        var courseModel = course.get();
+
+        BeanUtils.copyProperties(courseDto, courseModel);
+
+        courseModel.setLastUpdateDate(LocalDateTime.now(ZoneId.of("UTC")));
+
+        return ResponseEntity.status(HttpStatus.OK).body(courseService.save(courseModel));
     }
 
 }

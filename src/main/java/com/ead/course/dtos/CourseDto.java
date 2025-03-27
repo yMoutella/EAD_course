@@ -20,16 +20,19 @@ public class CourseDto {
   public interface CourseView {
     public static interface CourseRegistration {
     }
+
+    public static interface CourseUpdate {
+    }
   }
 
   private UUID courseId;
 
   @NotBlank
-  @JsonView(CourseView.CourseRegistration.class)
+  @JsonView({ CourseView.CourseRegistration.class, CourseView.CourseUpdate.class })
   private String name;
 
   @NotBlank
-  @JsonView(CourseView.CourseRegistration.class)
+  @JsonView({ CourseView.CourseRegistration.class, CourseView.CourseUpdate.class })
   private String description;
 
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
@@ -39,11 +42,11 @@ public class CourseDto {
   private LocalDateTime lastUpdateDate;
 
   @NotNull
-  @JsonView(CourseView.CourseRegistration.class)
+  @JsonView({ CourseView.CourseRegistration.class, CourseView.CourseUpdate.class })
   private CourseStatus courseStatus;
 
   @NotNull
-  @JsonView(CourseView.CourseRegistration.class)
+  @JsonView({ CourseView.CourseRegistration.class, CourseView.CourseUpdate.class })
   private CourseLevel courseLevel;
 
   @NotNull

@@ -68,4 +68,9 @@ public class CourseServiceImpl implements CourseService {
     }
 
   }
+
+  @Override
+  public Boolean existsByCourseId(UUID courseId) {
+    return courseRepository.existsById(courseId);
+  }
 }

@@ -1,7 +1,7 @@
 package com.ead.course.enums;
 
 public enum CourseStatus {
-  BEGINNER,
-  INTERMEDIARY,
 
+  INPROGRESS,
+  CONCLUDED,
 }
