@@ -45,4 +45,25 @@ public class LessonServiceImpl implements LessonService {
     return lessonRepository.existsById(lessonId);
   }
 
+  @Override
+  public Boolean existsByTitle(String title, UUID courseId) {
+    Optional<LessonModel> lesson = lessonRepository.findLessonWithTitleInCourse(courseId, title);
+
+    if (lesson.isEmpty()) {
+      return false;
+    }
+
+    return true;
+  }
+
+  @Override
+  public LessonModel save(LessonModel lesson) {
+    try {
+      return lessonRepository.save(lesson);
+    } catch (Exception e) {
+      System.out.printf("Error on save lesson %s -----> %s", lesson.getLessonId(), e);
+      return lesson;
+    }
+  }
+
 }

@@ -22,7 +22,7 @@ public class ModuleDto {
     }
 
     @NotNull
-    @Size(min = 50, max = 255, message = "The title doesn´t satisfy the size > 5 < 50", groups = {
+    @Size(min = 5, max = 30, message = "The title doesn´t satisfy the size > 5 < 50", groups = {
             ModuleView.ModuleRegistration.class })
     @JsonView(ModuleView.ModuleRegistration.class)
     private String title;

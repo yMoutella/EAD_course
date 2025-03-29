@@ -1,89 +1,98 @@
-// package com.ead.course.controllers;
+package com.ead.course.controllers;
 
-// import java.lang.classfile.ClassFile.Option;
-// import java.time.LocalDateTime;
-// import java.time.ZoneId;
-// import java.util.List;
-// import java.util.Optional;
-// import java.util.UUID;
+import java.lang.classfile.ClassFile.Option;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
-// import org.springframework.beans.BeanUtils;
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.http.HttpStatus;
-// import org.springframework.http.ResponseEntity;
-// import org.springframework.validation.annotation.Validated;
-// import org.springframework.web.bind.annotation.DeleteMapping;
-// import org.springframework.web.bind.annotation.GetMapping;
-// import org.springframework.web.bind.annotation.PathVariable;
-// import org.springframework.web.bind.annotation.PostMapping;
-// import org.springframework.web.bind.annotation.RequestBody;
-// import org.springframework.web.bind.annotation.RequestMapping;
-// import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-// import com.ead.course.dtos.LessonDto;
-// import com.ead.course.models.LessonModel;
-// import com.ead.course.services.LessonService;
-// import com.fasterxml.jackson.annotation.JsonView;
+import com.ead.course.dtos.LessonDto;
+import com.ead.course.models.LessonModel;
+import com.ead.course.models.ModuleModel;
+import com.ead.course.services.LessonService;
+import com.ead.course.services.ModuleService;
+import com.fasterxml.jackson.annotation.JsonView;
 
-// @RestController
-// @RequestMapping(path = "/lessons")
-// public class LessonController {
+@RestController
+@RequestMapping(path = "/lessons")
+public class LessonController {
 
-// @Autowired
-// LessonService lessonService;
+    @Autowired
+    LessonService lessonService;
 
-// @PostMapping
-// public ResponseEntity<Object> registerLesson(
-// @Validated(LessonDto.LessonView.LessonRegistration.class)
-// @JsonView(LessonDto.LessonView.LessonRegistration.class) @RequestBody
-// LessonDto lessonDto) {
+    @Autowired
+    ModuleService moduleService;
 
-// if (lessonService.existsById(lessonDto.getModuleId())) {
-// return ResponseEntity.status(HttpStatus.CONFLICT).body("This lesson already
-// exists!");
-// }
+    @PostMapping
+    public ResponseEntity<Object> registerLesson(
+            @Validated(LessonDto.LessonView.LessonRegistration.class) @JsonView(LessonDto.LessonView.LessonRegistration.class) @RequestBody LessonDto lessonDto) {
 
-// var lesson = new LessonModel();
-// BeanUtils.copyProperties(lessonDto, lesson);
+        if (!moduleService.existsById(lessonDto.getModuleId())) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Module not found!");
+        }
 
-// lesson.setCreationDate(LocalDateTime.now(ZoneId.of("UTC")));
+        if (lessonService.existsByTitle(lessonDto.getTitle(), lessonDto.getModuleId())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("Already exists a lesson with this title in this module");
+        }
 
-// return ResponseEntity.status(HttpStatus.CREATED).body(lesson);
-// }
+        Optional<ModuleModel> module = moduleService.getModule(lessonDto.getModuleId());
 
-// @GetMapping
-// public ResponseEntity<List<LessonModel>> listLessons() {
+        var lesson = new LessonModel();
+        BeanUtils.copyProperties(lessonDto, lesson);
 
-// List<LessonModel> lessons = lessonService.findAll();
-// return ResponseEntity.status(HttpStatus.OK).body(lessons);
+        lesson.setCreationDate(LocalDateTime.now(ZoneId.of("UTC")));
+        lesson.setModule(module.get());
 
-// }
+        return ResponseEntity.status(HttpStatus.CREATED).body(lessonService.save(lesson));
+    }
 
-// @GetMapping(path = "/{lessonId}")
-// public ResponseEntity<LessonModel> getLesson(@PathVariable UUID lessonId) {
+    @GetMapping
+    public ResponseEntity<List<LessonModel>> listLessons() {
 
-// Optional<LessonModel> lesson = lessonService.findById(lessonId);
+        List<LessonModel> lessons = lessonService.findAll();
+        return ResponseEntity.status(HttpStatus.OK).body(lessons);
 
-// if (!lesson.isEmpty()) {
-// return ResponseEntity.status(HttpStatus.OK).body(lesson.get());
-// }
+    }
 
-// return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-// }
+    @GetMapping(path = "/{lessonId}")
+    public ResponseEntity<LessonModel> getLesson(@PathVariable UUID lessonId) {
 
-// @DeleteMapping(path = "/{lessonId}")
-// public ResponseEntity<String> deleteLesson(@PathVariable UUID lessonId) {
+        Optional<LessonModel> lesson = lessonService.findById(lessonId);
 
-// Optional<LessonModel> lesson = lessonService.findById(lessonId);
+        if (!lesson.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.OK).body(lesson.get());
+        }
 
-// if (lesson.isEmpty()) {
-// return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Lesson not found!");
-// }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+    }
 
-// lessonService.deleteById(lesson.get());
+    @DeleteMapping(path = "/{lessonId}")
+    public ResponseEntity<String> deleteLesson(@PathVariable UUID lessonId) {
 
-// return ResponseEntity.status(HttpStatus.OK).body("Lesson: " + lessonId + "
-// deleted successfully!");
-// }
+        Optional<LessonModel> lesson = lessonService.findById(lessonId);
 
-// }
+        if (lesson.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Lesson not found!");
+        }
+
+        lessonService.deleteById(lesson.get());
+
+        return ResponseEntity.status(HttpStatus.OK).body("Lesson: " + lessonId + "deleted successfully!");
+    }
+
+}

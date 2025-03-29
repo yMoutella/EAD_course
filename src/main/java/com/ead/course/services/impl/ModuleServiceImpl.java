@@ -9,6 +9,7 @@ import com.ead.course.services.ModuleService;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,5 +65,15 @@ public class ModuleServiceImpl implements ModuleService {
       System.out.printf("Error trying to save module %s ----> %s", module.getModuleId(), e);
       return null;
     }
+  }
+
+  @Override
+  public List<ModuleModel> getModules() {
+    return moduleRepository.findAll();
+  }
+
+  @Override
+  public Optional<ModuleModel> getModule(UUID moduleId) {
+    return moduleRepository.findById(moduleId);
   }
 }

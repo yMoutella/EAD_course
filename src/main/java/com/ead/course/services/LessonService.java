@@ -10,7 +10,11 @@ public interface LessonService {
 
     void deleteById(LessonModel lesson);
 
+    LessonModel save(LessonModel lesson);
+
     Optional<LessonModel> findById(UUID lessonId);
+
+    Boolean existsByTitle(String title, UUID courseId);
 
     Boolean existsById(UUID lessonId);
 
