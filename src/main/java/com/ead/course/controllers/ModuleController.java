@@ -122,11 +122,20 @@ public class ModuleController {
                     .body("The given courseId doesn't exists!");
         }
 
-        if (!moduleService.existsModuleGivenCourseId(moduleDto.getCourseId(), moduleDto.getTitle())) {
+        Optional<ModuleModel> module = moduleService.getModule(moduleDto.getModuleId());
+
+        if (module.isEmpty()) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body("The given module title not exists in this course!");
         }
-        return ResponseEntity.status(200).body(null);
+
+        var moduleModel = module.get();
+
+        BeanUtils.copyProperties(moduleDto, moduleModel);
+        moduleModel.setUpdateDateTime(LocalDateTime.now(ZoneId.of("UTC")));
+        moduleService.save(moduleModel);
+
+        return ResponseEntity.status(HttpStatus.OK).body("Module updated successfully!");
 
     }
 
