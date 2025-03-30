@@ -23,18 +23,19 @@ public class ModuleDto {
 
     @NotNull
     @Size(min = 5, max = 30, message = "The title doesn´t satisfy the size > 5 < 50", groups = {
-            ModuleView.ModuleRegistration.class })
-    @JsonView(ModuleView.ModuleRegistration.class)
+            ModuleView.ModuleRegistration.class, ModuleView.ModuleUpdate.class })
+    @JsonView({ ModuleView.ModuleRegistration.class, ModuleView.ModuleUpdate.class })
     private String title;
 
     @NotNull
     @Size(min = 50, max = 255, message = "The description doesn´t satisfy the size > 50 < 255", groups = {
-            ModuleView.ModuleRegistration.class })
-    @JsonView(ModuleView.ModuleRegistration.class)
+            ModuleView.ModuleRegistration.class, ModuleView.ModuleUpdate.class })
+    @JsonView({ ModuleView.ModuleRegistration.class, ModuleView.ModuleUpdate.class })
     private String description;
 
-    @NotNull(message = "courseId must not be null", groups = { ModuleView.ModuleRegistration.class })
-    @JsonView(ModuleView.ModuleRegistration.class)
+    @NotNull(message = "courseId must not be null", groups = { ModuleView.ModuleRegistration.class,
+            ModuleView.ModuleUpdate.class })
+    @JsonView({ ModuleView.ModuleRegistration.class, ModuleView.ModuleUpdate.class })
     private UUID courseId;
 
 }

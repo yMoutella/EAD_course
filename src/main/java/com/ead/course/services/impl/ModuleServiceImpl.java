@@ -36,7 +36,6 @@ public class ModuleServiceImpl implements ModuleService {
 
     moduleRepository.delete(module);
 
-    throw new UnsupportedOperationException("Unimplemented method 'delete'");
   }
 
   @Override
