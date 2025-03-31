@@ -3,7 +3,6 @@ package com.ead.course.dtos;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import com.ead.course.dtos.LessonDto.LessonView.LessonRegistration;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
 

@@ -63,10 +63,15 @@ public class ModuleController {
         BeanUtils.copyProperties(moduleDto, module);
 
         module.setCreationDate(LocalDateTime.now(ZoneId.of("UTC")));
+        module.setUpdateDateTime(LocalDateTime.now(ZoneId.of("UTC")));
         module.setLesson(Collections.emptySet());
         module.setCourse(course.get());
 
-        moduleService.save(module);
+        try {
+            moduleService.save(module);
+        } catch (Exception e) {
+            System.out.printf("Error trying to save module: %s \n\n ----> %s", module, e);
+        }
 
         return ResponseEntity.status(HttpStatus.CREATED).body(module);
 

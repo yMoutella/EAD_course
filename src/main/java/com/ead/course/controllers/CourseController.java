@@ -79,7 +79,7 @@ public class CourseController {
             return ResponseEntity.status(HttpStatus.OK).body(courseModel);
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body("Course not found!");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Course not found!");
     }
 
     @PutMapping

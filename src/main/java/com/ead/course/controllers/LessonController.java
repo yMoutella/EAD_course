@@ -66,22 +66,27 @@ public class LessonController {
     @GetMapping // LIST
     public ResponseEntity<Object> listLessons() {
         List<LessonModel> lessons = lessonService.findAll();
-
-        var mLessons = lessons;
-
-        return ResponseEntity.status(HttpStatus.OK).body(mLessons);
+        List<LessonDto> lessonsDto = new ArrayList<>();
+        for (LessonModel lesson : lessons) {
+            var tempLesson = new LessonDto();
+            BeanUtils.copyProperties(lesson, tempLesson);
+            lessonsDto.add(tempLesson);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(lessonsDto);
     }
 
     @GetMapping(path = "/{lessonId}") // GET LESSON
-    public ResponseEntity<LessonModel> getLesson(@PathVariable UUID lessonId) {
+    public ResponseEntity<Object> getLesson(@PathVariable UUID lessonId) {
 
-        Optional<LessonModel> lesson = lessonService.findById(lessonId);
+        Optional<LessonModel> optionalLesson = lessonService.findById(lessonId);
 
-        if (!lesson.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.OK).body(lesson.get());
+        if (!optionalLesson.isEmpty()) {
+            var lesson = new LessonDto();
+            BeanUtils.copyProperties(optionalLesson.get(), lesson);
+            return ResponseEntity.status(HttpStatus.OK).body(lesson);
         }
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("lessonId not found!");
     }
 
     @DeleteMapping(path = "/{lessonId}") // Delete Lesson
