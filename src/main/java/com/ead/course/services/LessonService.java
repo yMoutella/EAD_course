@@ -16,6 +16,8 @@ public interface LessonService {
 
     Boolean existsByTitle(String title, UUID courseId);
 
+    Optional<LessonModel> getLessonInModule(UUID lessonId, UUID moduleId);
+
     Boolean existsById(UUID lessonId);
 
     List<LessonModel> findAll();

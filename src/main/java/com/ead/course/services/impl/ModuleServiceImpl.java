@@ -59,7 +59,8 @@ public class ModuleServiceImpl implements ModuleService {
   @Override
   public ModuleModel save(ModuleModel module) {
     try {
-      return moduleRepository.save(module);
+      moduleRepository.save(module);
+      return module;
     } catch (Exception e) {
       System.out.printf("Error trying to save module %s ----> %s", module.getModuleId(), e);
       return null;

@@ -26,7 +26,13 @@ public class LessonServiceImpl implements LessonService {
 
   @Override
   public List<LessonModel> findAll() {
-    return lessonRepository.findAll();
+    try {
+      List<LessonModel> lessons = lessonRepository.findAll();
+      return lessons;
+    } catch (Exception e) {
+      System.out.printf("Error in retrieve lesson list -----> %s", e);
+      return null;
+    }
   }
 
   @Transactional
@@ -63,6 +69,16 @@ public class LessonServiceImpl implements LessonService {
     } catch (Exception e) {
       System.out.printf("Error on save lesson %s -----> %s", lesson.getLessonId(), e);
       return lesson;
+    }
+  }
+
+  @Override
+  public Optional<LessonModel> getLessonInModule(UUID lessonId, UUID moduleId) {
+    try {
+      return lessonRepository.findLessonIntoModule(lessonId, moduleId);
+    } catch (Exception e) {
+      System.out.printf("Error in retrieve lesson %s into module %s -----> %s", lessonId, moduleId, e);
+      return null;
     }
   }
 
