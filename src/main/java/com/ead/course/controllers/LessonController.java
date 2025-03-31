@@ -66,16 +66,10 @@ public class LessonController {
     @GetMapping // LIST
     public ResponseEntity<Object> listLessons() {
         List<LessonModel> lessons = lessonService.findAll();
-        List<LessonDto> lessonsDto = new ArrayList<>();
 
-        for (LessonModel lesson : lessons) {
-            LessonDto l = new LessonDto();
-            BeanUtils.copyProperties(lesson, l);
-            lessonsDto.add(l);
-        }
+        var mLessons = lessons;
 
-        return ResponseEntity.status(HttpStatus.OK).body(lessonsDto);
-
+        return ResponseEntity.status(HttpStatus.OK).body(mLessons);
     }
 
     @GetMapping(path = "/{lessonId}") // GET LESSON
