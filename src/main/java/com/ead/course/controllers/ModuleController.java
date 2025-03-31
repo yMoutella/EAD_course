@@ -41,11 +41,12 @@ public class ModuleController {
     @Autowired
     CourseService courseService;
 
-    @PostMapping // CREATION
+    @PostMapping(path = "/courses/{courseId}/modules") // CREATION
     public ResponseEntity<Object> registerModule(
-            @Validated(ModuleDto.ModuleView.ModuleRegistration.class) @RequestBody @JsonView(ModuleDto.ModuleView.ModuleRegistration.class) ModuleDto moduleDto) {
+            @Validated(ModuleDto.ModuleView.ModuleRegistration.class) @RequestBody @JsonView(ModuleDto.ModuleView.ModuleRegistration.class) ModuleDto moduleDto,
+            @PathVariable(value = "courseId") UUID courseId) {
 
-        Optional<CourseModel> course = courseService.findByCourseId(moduleDto.getCourseId());
+        Optional<CourseModel> course = courseService.findByCourseId(courseId);
 
         if (course.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -53,7 +54,7 @@ public class ModuleController {
 
         }
 
-        if (moduleService.existsModuleGivenCourseId(moduleDto.getCourseId(), moduleDto.getTitle())) {
+        if (moduleService.existsModuleGivenCourseId(courseId, moduleDto.getTitle())) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body("The given module title exists in this course already!");
         }
