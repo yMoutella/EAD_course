@@ -68,12 +68,17 @@ public class ModuleServiceImpl implements ModuleService {
   }
 
   @Override
-  public List<ModuleModel> getModules() {
-    return moduleRepository.findAll();
+  public List<ModuleModel> getModules(UUID courseId) {
+    try {
+      return moduleRepository.findAllModulesIntoCourse(courseId);
+    } catch (Exception e) {
+      System.out.printf("Error in retrieve modules from course ----> %s", e);
+      return null;
+    }
   }
 
   @Override
-  public Optional<ModuleModel> getModule(UUID moduleId) {
-    return moduleRepository.findById(moduleId);
+  public Optional<ModuleModel> findModuleIntoCourse(UUID courseId, UUID moduleId) {
+    return moduleRepository.findModuleIntoCourse(courseId, moduleId);
   }
 }

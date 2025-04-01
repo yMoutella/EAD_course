@@ -21,10 +21,6 @@ public class ModuleDto {
         }
     }
 
-    @NotNull(message = "The title doesn´t satisfy the size > 5 < 50", groups = { ModuleView.ModuleUpdate.class })
-    @JsonView({ ModuleView.ModuleUpdate.class })
-    private UUID moduleId;
-
     @NotNull
     @Size(min = 5, max = 30, message = "The title doesn´t satisfy the size > 5 < 50", groups = {
             ModuleView.ModuleRegistration.class, ModuleView.ModuleUpdate.class })
@@ -36,12 +32,4 @@ public class ModuleDto {
             ModuleView.ModuleRegistration.class, ModuleView.ModuleUpdate.class })
     @JsonView({ ModuleView.ModuleRegistration.class, ModuleView.ModuleUpdate.class })
     private String description;
-
-    // @NotNull(message = "courseId must not be null", groups = {
-    // ModuleView.ModuleRegistration.class,
-    // ModuleView.ModuleUpdate.class })
-    // @JsonView({ ModuleView.ModuleRegistration.class,
-    // ModuleView.ModuleUpdate.class })
-    // private UUID courseId;
-
 }

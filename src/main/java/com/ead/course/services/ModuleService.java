@@ -12,9 +12,9 @@ public interface ModuleService {
 
     Boolean existsModuleGivenCourseId(UUID courseId, String title);
 
-    List<ModuleModel> getModules();
+    List<ModuleModel> getModules(UUID courseId);
 
-    Optional<ModuleModel> getModule(UUID moduleId);
+    Optional<ModuleModel> findModuleIntoCourse(UUID courseId, UUID moduleId);
 
     void delete(ModuleModel module);
 
