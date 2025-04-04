@@ -20,5 +20,5 @@ public interface LessonService {
 
     Boolean existsById(UUID lessonId);
 
-    List<LessonModel> findAll();
+    List<LessonModel> findAll(UUID courseId, UUID moduleId);
 }

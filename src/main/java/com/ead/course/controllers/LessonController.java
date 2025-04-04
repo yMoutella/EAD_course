@@ -1,5 +1,6 @@
 package com.ead.course.controllers;
 
+import java.lang.classfile.ClassFile.Option;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,14 +25,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ead.course.dtos.LessonDto;
 import com.ead.course.dtos.LessonDto.LessonView;
+import com.ead.course.models.CourseModel;
 import com.ead.course.models.LessonModel;
 import com.ead.course.models.ModuleModel;
+import com.ead.course.services.CourseService;
 import com.ead.course.services.LessonService;
 import com.ead.course.services.ModuleService;
 import com.fasterxml.jackson.annotation.JsonView;
 
 @RestController
-@RequestMapping(path = "/lessons")
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class LessonController {
 
     @Autowired
@@ -39,20 +43,32 @@ public class LessonController {
     @Autowired
     ModuleService moduleService;
 
-    @PostMapping // CREATE
-    public ResponseEntity<Object> registerLesson(
-            @Validated(LessonDto.LessonView.LessonRegistration.class) @JsonView(LessonDto.LessonView.LessonRegistration.class) @RequestBody LessonDto lessonDto) {
+    @Autowired
+    CourseService courseService;
 
-        if (!moduleService.existsById(lessonDto.getModuleId())) {
+    @PostMapping(path = "/courses/{courseId}/modules/{moduleId}/lessons") // CREATE
+    public ResponseEntity<Object> registerLesson(
+            @Validated(LessonDto.LessonView.LessonRegistration.class) @JsonView(LessonDto.LessonView.LessonRegistration.class) @RequestBody LessonDto lessonDto,
+            @PathVariable UUID courseId, @PathVariable UUID moduleId) {
+
+        Optional<CourseModel> course = courseService.findByCourseId(courseId);
+
+        if (course.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Course not found!");
+        }
+
+        Optional<ModuleModel> module = moduleService.findModuleIntoCourse(courseId, moduleId);
+
+        if (module.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Module not found!");
         }
 
-        if (lessonService.existsByTitle(lessonDto.getTitle(), lessonDto.getModuleId())) {
+        Boolean lessonExists = lessonService.existsByTitle(lessonDto.getTitle(), courseId);
+
+        if (lessonExists) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body("Already exists a lesson with this title in this module");
         }
-
-        Optional<ModuleModel> module = moduleService.getModule(lessonDto.getModuleId());
 
         var lesson = new LessonModel();
         BeanUtils.copyProperties(lessonDto, lesson);
@@ -63,30 +79,49 @@ public class LessonController {
         return ResponseEntity.status(HttpStatus.CREATED).body(lessonService.save(lesson));
     }
 
-    @GetMapping // LIST
-    public ResponseEntity<Object> listLessons() {
-        List<LessonModel> lessons = lessonService.findAll();
-        List<LessonDto> lessonsDto = new ArrayList<>();
-        for (LessonModel lesson : lessons) {
-            var tempLesson = new LessonDto();
-            BeanUtils.copyProperties(lesson, tempLesson);
-            lessonsDto.add(tempLesson);
+    @GetMapping(path = "/courses/{courseId}/modules/{moduleId}/lessons") // LIST
+    public ResponseEntity<Object> listLessons(@PathVariable UUID courseId, @PathVariable UUID moduleId) {
+        Optional<CourseModel> course = courseService.findByCourseId(courseId);
+
+        if (course.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Course not found!");
         }
-        return ResponseEntity.status(HttpStatus.OK).body(lessonsDto);
+
+        Optional<ModuleModel> module = moduleService.findModuleIntoCourse(courseId, moduleId);
+
+        if (module.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Module not found!");
+        }
+
+        List<LessonModel> lessons = lessonService.findAll(courseId, moduleId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(lessons);
     }
 
-    @GetMapping(path = "/{lessonId}") // GET LESSON
-    public ResponseEntity<Object> getLesson(@PathVariable UUID lessonId) {
+    @GetMapping(path = "courses/{courseId}/modules/{moduleId}/lessons/{lessonId}") // GET LESSON
+    public ResponseEntity<Object> getLesson(@PathVariable UUID courseId, @PathVariable UUID moduleId,
+            @PathVariable UUID lessonId) {
 
-        Optional<LessonModel> optionalLesson = lessonService.findById(lessonId);
+        Optional<CourseModel> course = courseService.findByCourseId(courseId);
 
-        if (!optionalLesson.isEmpty()) {
-            var lesson = new LessonDto();
-            BeanUtils.copyProperties(optionalLesson.get(), lesson);
-            return ResponseEntity.status(HttpStatus.OK).body(lesson);
+        if (course.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Course not found!");
         }
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("lessonId not found!");
+        Optional<ModuleModel> module = moduleService.findModuleIntoCourse(courseId, moduleId);
+
+        if (module.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Module not found!");
+        }
+
+        Optional<LessonModel> lesson = lessonService.findById(lessonId);
+
+        if (lesson.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("lessonId not found!");
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(lesson);
+
     }
 
     @DeleteMapping(path = "/{lessonId}") // Delete Lesson
@@ -103,26 +138,29 @@ public class LessonController {
         return ResponseEntity.status(HttpStatus.OK).body("Lesson: " + lessonId + "deleted successfully!");
     }
 
-    @PutMapping(path = "/{lessonId}") // UPDATE LESSON
-    public ResponseEntity<Object> updateLesson(
-            @Validated(LessonView.LessonUpdate.class) @JsonView(LessonView.LessonUpdate.class) @RequestBody LessonDto lessonDto) {
+    // @PutMapping(path = "/{lessonId}") // UPDATE LESSON
+    // public ResponseEntity<Object> updateLesson(
+    // @Validated(LessonView.LessonUpdate.class)
+    // @JsonView(LessonView.LessonUpdate.class) @RequestBody LessonDto lessonDto) {
 
-        Optional<LessonModel> lesson = lessonService.findById(lessonDto.getLessonId());
-        Optional<ModuleModel> module = moduleService.getModule(lessonDto.getModuleId());
+    // Optional<LessonModel> lesson =
+    // lessonService.findById(lessonDto.getLessonId());
+    // Optional<ModuleModel> module =
+    // moduleService.getModule(lessonDto.getModuleId());
 
-        if (module.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Module not found!");
-        }
-        if (lesson.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Lesson not found!");
+    // if (module.isEmpty()) {
+    // return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Module not found!");
+    // }
+    // if (lesson.isEmpty()) {
+    // return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Lesson not found!");
 
-        }
+    // }
 
-        var mLesson = lesson.get();
-        BeanUtils.copyProperties(lessonDto, mLesson);
+    // var mLesson = lesson.get();
+    // BeanUtils.copyProperties(lessonDto, mLesson);
 
-        return ResponseEntity.status(200).body(null);
+    // return ResponseEntity.status(200).body(null);
 
-    }
+    // }
 
 }

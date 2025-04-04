@@ -1,7 +1,9 @@
 package com.ead.course.services.impl;
 
 import com.ead.course.models.LessonModel;
+import com.ead.course.models.ModuleModel;
 import com.ead.course.repository.LessonRepository;
+import com.ead.course.repository.ModuleRepository;
 import com.ead.course.services.LessonService;
 
 import jakarta.transaction.Transactional;
@@ -19,15 +21,20 @@ public class LessonServiceImpl implements LessonService {
   @Autowired
   LessonRepository lessonRepository;
 
+  @Autowired
+  ModuleRepository moduleRepository;
+
   @Override
   public Optional<LessonModel> findById(UUID lessonId) {
     return lessonRepository.findById(lessonId);
   }
 
   @Override
-  public List<LessonModel> findAll() {
+  public List<LessonModel> findAll(UUID courseId, UUID moduleId) {
+
+    Optional<ModuleModel> module = moduleRepository.findModuleIntoCourse(courseId, moduleId);
     try {
-      List<LessonModel> lessons = lessonRepository.findAll();
+      List<LessonModel> lessons = lessonRepository.findAllLessonIntoModule(module.get().getModuleId());
       return lessons;
     } catch (Exception e) {
       System.out.printf("Error in retrieve lesson list -----> %s", e);

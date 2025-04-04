@@ -40,13 +40,5 @@ public class LessonDto {
     @NotNull(message = "videoUrl cannot be null")
     private String videoUrl;
 
-    @JsonView(LessonView.LessonRegistration.class)
-    @NotNull(message = "lessonId cannot be null")
-    private UUID lessonId;
-
-    @JsonView(LessonView.LessonRegistration.class)
-    @NotNull(message = "moduleId cannot be null")
-    private UUID moduleId;
-
     private LocalDateTime creationDate;
 }
