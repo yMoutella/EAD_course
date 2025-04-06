@@ -124,8 +124,21 @@ public class LessonController {
 
     }
 
-    @DeleteMapping(path = "/{lessonId}") // Delete Lesson
-    public ResponseEntity<String> deleteLesson(@PathVariable UUID lessonId) {
+    @DeleteMapping(path = "/courses/{courseId}/modules/{moduleId}/lessons/{lessonId}") // Delete Lesson
+    public ResponseEntity<String> deleteLesson(@PathVariable UUID courseId, @PathVariable UUID moduleId,
+            @PathVariable UUID lessonId) {
+
+        Optional<CourseModel> course = courseService.findByCourseId(courseId);
+
+        if (course.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Course not found!");
+        }
+
+        Optional<ModuleModel> module = moduleService.findModuleIntoCourse(courseId, moduleId);
+
+        if (module.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Module not found!");
+        }
 
         Optional<LessonModel> lesson = lessonService.findById(lessonId);
 
@@ -138,29 +151,41 @@ public class LessonController {
         return ResponseEntity.status(HttpStatus.OK).body("Lesson: " + lessonId + "deleted successfully!");
     }
 
-    // @PutMapping(path = "/{lessonId}") // UPDATE LESSON
-    // public ResponseEntity<Object> updateLesson(
-    // @Validated(LessonView.LessonUpdate.class)
-    // @JsonView(LessonView.LessonUpdate.class) @RequestBody LessonDto lessonDto) {
+    @PutMapping(path = "/courses/{courseId}/modules/{moduleId}/lessons/{lessonId}") // UPDATE LESSON
+    public ResponseEntity<Object> updateLesson(
+            @Validated(LessonView.LessonUpdate.class) @JsonView(LessonView.LessonUpdate.class) @RequestBody LessonDto lessonDto,
+            @PathVariable UUID courseId, @PathVariable UUID moduleId, UUID lessonId) {
 
-    // Optional<LessonModel> lesson =
-    // lessonService.findById(lessonDto.getLessonId());
-    // Optional<ModuleModel> module =
-    // moduleService.getModule(lessonDto.getModuleId());
+        Optional<CourseModel> course = courseService.findByCourseId(courseId);
 
-    // if (module.isEmpty()) {
-    // return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Module not found!");
-    // }
-    // if (lesson.isEmpty()) {
-    // return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Lesson not found!");
+        if (course.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Course not found!");
+        }
 
-    // }
+        Optional<ModuleModel> module = moduleService.findModuleIntoCourse(courseId, moduleId);
 
-    // var mLesson = lesson.get();
-    // BeanUtils.copyProperties(lessonDto, mLesson);
+        if (module.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Module not found!");
+        }
 
-    // return ResponseEntity.status(200).body(null);
+        Optional<LessonModel> lesson = lessonService.findById(lessonId);
 
-    // }
+        if (lesson.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Lesson not found!");
+        }
+
+        var lessonModel = new LessonModel();
+
+        BeanUtils.copyProperties(lessonDto, lessonModel);
+
+        try {
+            lessonService.save(lessonModel);
+        } catch (Exception e) {
+            System.out.printf("Error in update lesson! ----> %s", e);
+        }
+
+        return ResponseEntity.status(200).body(null);
+
+    }
 
 }
