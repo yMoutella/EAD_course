@@ -1,14 +1,18 @@
 package com.ead.course.services.impl;
 
 import com.ead.course.services.CourseService;
+import com.ead.course.specifications.SpecificationTemplate;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
 
 import com.ead.course.models.CourseModel;
 import com.ead.course.models.LessonModel;
@@ -30,8 +34,9 @@ public class CourseServiceImpl implements CourseService {
   LessonRepository lessonRepository;
 
   @Override
-  public List<CourseModel> findAll() {
-    return courseRepository.findAll();
+  public Page<CourseModel> findAll(Specification<CourseModel> spec,
+      Pageable pageable) {
+    return courseRepository.findAll(spec, pageable);
   }
 
   @Override
