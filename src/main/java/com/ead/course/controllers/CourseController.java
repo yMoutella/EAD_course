@@ -7,7 +7,6 @@ import java.util.UUID;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -35,74 +34,74 @@ import com.fasterxml.jackson.annotation.JsonView;
 @CrossOrigin(origins = "*", maxAge = 3600)
 public class CourseController {
 
-  @Autowired
-  CourseService courseService;
+    @Autowired
+    CourseService courseService;
 
-  @PostMapping
-  public ResponseEntity<CourseModel> registerCourse(
-      @Validated(CourseDto.CourseView.CourseRegistration.class) @RequestBody @JsonView(CourseDto.CourseView.CourseRegistration.class) CourseDto dto) {
+    @PostMapping
+    public ResponseEntity<CourseModel> registerCourse(
+            @Validated(CourseDto.CourseView.CourseRegistration.class) @RequestBody @JsonView(CourseDto.CourseView.CourseRegistration.class) CourseDto dto) {
 
-    var courseModel = new CourseModel();
-    BeanUtils.copyProperties(dto, courseModel);
+        var courseModel = new CourseModel();
+        BeanUtils.copyProperties(dto, courseModel);
 
-    courseModel.setCreationDate(LocalDateTime.now(ZoneId.of("UTC")));
-    courseModel.setLastUpdateDate(LocalDateTime.now(ZoneId.of("UTC")));
-    courseModel.setUserInsctructor(UUID.randomUUID());
+        courseModel.setCreationDate(LocalDateTime.now(ZoneId.of("UTC")));
+        courseModel.setLastUpdateDate(LocalDateTime.now(ZoneId.of("UTC")));
+        courseModel.setUserInsctructor(UUID.randomUUID());
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(courseService.save(courseModel));
-  }
-
-  @DeleteMapping(path = "/{courseId}")
-  public ResponseEntity<String> deleteCourse(@PathVariable UUID courseId) {
-
-    Optional<CourseModel> course = courseService.findByCourseId(courseId);
-
-    if (course.isEmpty()) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("This course doesn't exist");
-    }
-    var courseModel = course.get();
-
-    courseService.delete(courseModel);
-    return ResponseEntity.status(HttpStatus.OK).body("Course: " + courseId + " deleted successfully!");
-
-  }
-
-  @GetMapping // Specification template used to filter data in request
-  public ResponseEntity<Page<CourseModel>> getCourses(SpecificationTemplate.CourseSpec spec,
-      @PageableDefault(page = 0, size = 10, sort = "courseId", direction = Sort.Direction.ASC) Pageable pageable) {
-
-    return ResponseEntity.status(HttpStatus.OK).body(courseService.findAll(spec, pageable));
-
-  }
-
-  @GetMapping(path = "/{courseId}")
-  public ResponseEntity<Object> getCourse(@PathVariable UUID courseId) {
-
-    Optional<CourseModel> courseModel = courseService.findByCourseId(courseId);
-    if (!courseModel.isEmpty()) {
-      return ResponseEntity.status(HttpStatus.OK).body(courseModel);
+        return ResponseEntity.status(HttpStatus.CREATED).body(courseService.save(courseModel));
     }
 
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Course not found!");
-  }
+    @DeleteMapping(path = "/{courseId}")
+    public ResponseEntity<String> deleteCourse(@PathVariable UUID courseId) {
 
-  @PutMapping
-  public ResponseEntity<CourseModel> updateCourse(
-      @RequestBody CourseDto courseDto) {
+        Optional<CourseModel> course = courseService.findByCourseId(courseId);
 
-    Optional<CourseModel> course = courseService.findByCourseId(courseDto.getCourseId());
+        if (course.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("This course doesn't exist");
+        }
+        var courseModel = course.get();
 
-    if (course.isEmpty()) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        courseService.delete(courseModel);
+        return ResponseEntity.status(HttpStatus.OK).body("Course: " + courseId + " deleted successfully!");
+
     }
 
-    var courseModel = course.get();
+    @GetMapping // Specification template used to filter data in request
+    public ResponseEntity<Object> getCourses(SpecificationTemplate.CourseSpec spec,
+            @PageableDefault(page = 0, size = 10, sort = "courseId", direction = Sort.Direction.ASC) Pageable pageable) {
 
-    BeanUtils.copyProperties(courseDto, courseModel);
+        return ResponseEntity.status(HttpStatus.OK).body(courseService.findAll(spec, pageable));
 
-    courseModel.setLastUpdateDate(LocalDateTime.now(ZoneId.of("UTC")));
+    }
 
-    return ResponseEntity.status(HttpStatus.OK).body(courseService.save(courseModel));
-  }
+    @GetMapping(path = "/{courseId}")
+    public ResponseEntity<Object> getCourse(@PathVariable UUID courseId) {
+
+        Optional<CourseModel> courseModel = courseService.findByCourseId(courseId);
+        if (!courseModel.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.OK).body(courseModel);
+        }
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Course not found!");
+    }
+
+    @PutMapping
+    public ResponseEntity<CourseModel> updateCourse(
+            @RequestBody CourseDto courseDto) {
+
+        Optional<CourseModel> course = courseService.findByCourseId(courseDto.getCourseId());
+
+        if (course.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        var courseModel = course.get();
+
+        BeanUtils.copyProperties(courseDto, courseModel);
+
+        courseModel.setLastUpdateDate(LocalDateTime.now(ZoneId.of("UTC")));
+
+        return ResponseEntity.status(HttpStatus.OK).body(courseService.save(courseModel));
+    }
 
 }

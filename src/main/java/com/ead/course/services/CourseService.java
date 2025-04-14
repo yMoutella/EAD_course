@@ -11,13 +11,13 @@ import com.ead.course.models.CourseModel;
 
 public interface CourseService {
 
-	Page<CourseModel> findAll(Specification<CourseModel> spec, Pageable pageable);
+    Page<CourseModel> findAll(Specification<CourseModel> spec, Pageable pageable);
 
-	Optional<CourseModel> findByCourseId(UUID courseId);
+    Optional<CourseModel> findByCourseId(UUID courseId);
 
-	Boolean existsByCourseId(UUID courseId);
+    Boolean existsByCourseId(UUID courseId);
 
-	CourseModel save(CourseModel course);
+    CourseModel save(CourseModel course);
 
-	void delete(CourseModel course);
+    void delete(CourseModel course);
 }
